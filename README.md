@@ -10,8 +10,7 @@ Build
 
 Config
 -----
-
-    edit your config/sys.config:
+edit your config/sys.config:
     `forward` field used for proxy chain;
     auth for server/forward support three auth method:
     1. {16#7c, "password"}          // the recommand method, support encrypt
@@ -22,6 +21,7 @@ Run
 -----
 
     $ mkdir release
-    $ cd release && tar zxvf ../_build/prod/rel/erl_proxy/erl_proxy-0.1.0.tar.gz 
+    $ cd release && tar zxvf ../_build/prod/rel/erl_proxy/erl_proxy-0.1.0.tar.gz
+or just download the release tarball and untar
     $ cd bin
     $ erl_proxy start
