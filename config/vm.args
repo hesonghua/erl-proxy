@@ -1,0 +1,6 @@
+-sname erl_proxy
+
+-setcookie erl_proxy_cookie
+
++K true
++A30

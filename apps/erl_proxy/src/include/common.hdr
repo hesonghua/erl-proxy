@@ -1,0 +1,9 @@
+-define(DWORD, 32/unsigned-little-integer).
+-define(LONG, 32/unsigned-little-integer).
+-define(WORD, 16/unsigned-little-integer).
+-define(BYTE, 8/unsigned-little-integer).
+
+-define(BIG_DWORD, 32/unsigned-big-integer).
+-define(BIG_WORD, 16/unsigned-big-integer).
+
+-define(TCP_OPTIONS, [binary, {packet, 0}, {active, false}, {reuseaddr, true}, {nodelay, false}, {delay_send, true}, {send_timeout, 5000}, {keepalive, true}, {exit_on_close, true}]).
