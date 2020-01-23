@@ -103,7 +103,8 @@ handle({url, response}, S=#state{downsock=Socket}) ->
     S1 = sock_send(Socket, <<5:8, 0:8, 0:8, 1:8, 0:32, 0:16>>, S),
     handle(transfer, S1);
 
-handle(transfer, S1=#state{downsock=DownSock, upsock=UpSock}) ->
+handle(transfer, S0=#state{downsock=DownSock, downbuf=Buffer, upsock=UpSock}) ->
+    S1 = sock_send(UpSock, Buffer, S0),
     receive
         {tcp, DownSock, DownBin1} ->
             inet:setopts(DownSock, [{active, once}]),
