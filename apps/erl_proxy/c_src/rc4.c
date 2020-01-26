@@ -37,7 +37,6 @@ static ERL_NIF_TERM rc4_new_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM arg
     struct rc4_ctx_t *rc4;
     ErlNifBinary data;
     unsigned char *key;
-    int klen;
     ERL_NIF_TERM ret;
 
     if (!enif_inspect_iolist_as_binary(env, argv[0], &data))
@@ -68,7 +67,7 @@ static ERL_NIF_TERM rc4_new_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM arg
 
 static ERL_NIF_TERM rc4_update_nif(ErlNifEnv* env, int argc, const ERL_NIF_TERM argv[])
 {
-    unsigned char i, j, k;
+    unsigned char i, j;
     unsigned char *src;
     struct rc4_ctx_t *rc4, *new;
     unsigned char *outp;
