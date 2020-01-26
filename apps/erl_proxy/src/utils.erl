@@ -1,15 +1,12 @@
 -module(utils).
 -export([calc_md5_key/2, encode/2, decode/2, read_at_least/3, for/3, for/4]).
 
-%% for循环
 for(Max, Max, F) ->
     F(Max);
 for(I, Max, F)   ->
     F(I),
     for(I+1, Max, F).
 
-%% 带返回状态的for循环
-%% @return {ok, State}
 for(Max, Min, _F, State) when Min<Max -> {ok, State};
 for(Max, Max, F, State) -> F(Max, State);
 for(I, Max, F, State)   -> {ok, NewState} = F(I, State), for(I+1, Max, F, NewState).
@@ -41,12 +38,12 @@ decode(Bin, undefined) ->
     {Bin, undefined};
 
 decode(Bin, Enc) ->
-    {Enc1, Bin1} = mycrypto:simple_update(Enc, Bin),
+    {Enc1, Bin1} = rc4:update(Enc, Bin),
     {Bin1, Enc1}.
 
 encode(Bin, undefined) ->
     {Bin, undefined};
 
 encode(Bin, Enc) ->
-    {Enc1, Bin1} = mycrypto:simple_update(Enc, Bin),
+    {Enc1, Bin1} = rc4:update(Enc, Bin),
     {Bin1, Enc1}.

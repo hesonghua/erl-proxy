@@ -42,7 +42,7 @@ auth(Socket, Target, Buffer, {16#7c, Password}) ->
     gen_tcp:send(Socket, MD5),
     {ok, Bin1} = utils:read_at_least(Socket, 2, Rest),
     <<5:8, 0:8>> = Bin1,
-    request(Socket, Target, mycrypto:simple_new(Key), mycrypto:simple_new(Key));
+    request(Socket, Target, rc4:new(Key), rc4:new(Key));
 
 auth(Socket, Target, Buffer, {2, Username, Password}) ->
     {UBin, PBin} = {list_to_binary(Username), list_to_binary(Password)},

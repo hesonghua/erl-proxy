@@ -49,7 +49,7 @@ handle({16#7c, {16#7c, Password}}, S=#state{downsock=Socket, downbuf=Buffer}) ->
     {MD5, Key} = utils:calc_md5_key(list_to_binary(Password), <<A:8,B:8,C:8,D:8>>),
     {ok, <<MD5:16/binary, Rest/binary>>} = utils:read_at_least(Socket, 16, Buffer),
     gen_tcp:send(Socket, <<5:8, 0:8>>),
-    handle(request, S#state{downin=mycrypto:simple_new(Key), downout=mycrypto:simple_new(Key), downbuf=Rest});
+    handle(request, S#state{downin=rc4:new(Key), downout=rc4:new(Key), downbuf=Rest});
 
 handle({2, {2, Username, Password}}, S=#state{downsock=Socket, downbuf=Buffer}) ->
     gen_tcp:send(Socket, <<5:8, 2:8>>),

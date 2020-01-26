@@ -15,9 +15,9 @@ C_SRC_DIR = $(CURDIR)
 
 UNAME_SYS := $(shell uname -s)
 ifeq ($(UNAME_SYS), Linux)
-	C_SRC_OUTPUT ?= $(CURDIR)/../priv/mycrypto.so
+	C_SRC_OUTPUT ?= $(CURDIR)/../priv/rc4.so
 else
-	C_SRC_OUTPUT ?= $(CURDIR)/../priv/mycrypto.dll
+	C_SRC_OUTPUT ?= $(CURDIR)/../priv/rc4.dll
 endif
 ifeq ($(UNAME_SYS), Darwin)
 	CC ?= cc

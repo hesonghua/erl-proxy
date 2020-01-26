@@ -1,7 +1,7 @@
--module(mycrypto).
--export([init/0, rc4_new/1, rc4_update/2, simple_new/1, simple_update/2]).
+-module(rc4).
+-export([init/0, new/1, update/2]).
 -define(APPNAME, erl_proxy).
--define(LIBNAME, mycrypto).
+-define(LIBNAME, rc4).
 -on_load(init/0).
 
 init() ->
@@ -18,14 +18,8 @@ init() ->
     end,
     erlang:load_nif(SoName, 0).
 
-rc4_new(_Key) ->
+new(_Key) ->
     "not implemented".
 
-rc4_update(_RC4, _Data) ->
-    "not implemented".
-
-simple_new(_Key) ->
-    "not implemented".
-
-simple_update(_RC4, _Data) ->
+update(_RC4, _Data) ->
     "not implemented".
