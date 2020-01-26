@@ -2,25 +2,25 @@
 -export([start_link/1, loop/1]).
 -include("common.hdr").
 
--record(state, {options, downsock, upsock, downbuf, upbuf, downkey=undefined, idown=0, odown=0, upkey=undefined, iup=0, oup = 0}).
+-record(state, {options, downsock, upsock, downbuf, upbuf, downin=undefined, downout=undefined, upin=undefined, upout=undefined}).
 
-sock_send(Socket, Bin, S=#state{downsock=Socket, downkey=Key, odown=Index}) ->
-    {Bin1, Index1} = utils:encode(Bin, Key, Index),
+sock_send(Socket, Bin, S=#state{downsock=Socket, downout=Enc}) ->
+    {Bin1, Enc1} = utils:encode(Bin, Enc),
     gen_tcp:send(Socket, Bin1),
-    S#state{odown = Index1};
+    S#state{downout = Enc1};
 
-sock_send(Socket, Bin, S=#state{upsock=Socket, upkey=Key, oup=Index}) ->
-    {Bin1, Index1} = utils:encode(Bin, Key, Index),
+sock_send(Socket, Bin, S=#state{upsock=Socket, upout=Enc}) ->
+    {Bin1, Enc1} = utils:encode(Bin, Enc),
     gen_tcp:send(Socket, Bin1),
-    S#state{oup = Index1}.
+    S#state{upout = Enc1}.
 
-sock_recv(Socket, Bin, S=#state{downsock=Socket, downkey=Key, idown=Index}) ->
-    {Bin1, Index1} = utils:decode(Bin, Key, Index),
-    {Bin1, S#state{idown=Index1}};
+sock_recv(Socket, Bin, S=#state{downsock=Socket, downin=Enc}) ->
+    {Bin1, Enc1} = utils:decode(Bin, Enc),
+    {Bin1, S#state{downin=Enc1}};
 
-sock_recv(Socket, Bin, S=#state{upsock=Socket, upkey=Key, iup=Index}) ->
-    {Bin1, Index1} = utils:decode(Bin, Key, Index),
-    {Bin1, S#state{iup=Index1}}.
+sock_recv(Socket, Bin, S=#state{upsock=Socket, upin=Enc}) ->
+    {Bin1, Enc1} = utils:decode(Bin, Enc),
+    {Bin1, S#state{upin=Enc1}}.
 
 start_link(Options) ->
     Pid = spawn_link(?MODULE, loop, [#state{options=Options}]),
@@ -49,7 +49,7 @@ handle({16#7c, {16#7c, Password}}, S=#state{downsock=Socket, downbuf=Buffer}) ->
     {MD5, Key} = utils:calc_md5_key(list_to_binary(Password), <<A:8,B:8,C:8,D:8>>),
     {ok, <<MD5:16/binary, Rest/binary>>} = utils:read_at_least(Socket, 16, Buffer),
     gen_tcp:send(Socket, <<5:8, 0:8>>),
-    handle(request, S#state{downkey=binary_to_list(Key), downbuf=Rest});
+    handle(request, S#state{downin=mycrypto:simple_new(Key), downout=mycrypto:simple_new(Key), downbuf=Rest});
 
 handle({2, {2, Username, Password}}, S=#state{downsock=Socket, downbuf=Buffer}) ->
     gen_tcp:send(Socket, <<5:8, 2:8>>),
@@ -96,8 +96,8 @@ handle({url, undefined, {Cmd, Host, Port}}, S1=#state{downsock=Socket, downbuf=B
 
 handle({url, Forward = {ForwardHost, ForwardPort, Auth}, {_, Host, Port}}, S1=#state{downbuf=Buffer}) ->
     error_logger:info_msg("handle forward:~p Buffer:~p~n", [Forward, Buffer]),
-    {ok, UpSock, Key, IKey, OKey} = sock5:connect({ForwardHost, ForwardPort}, {Host, Port}, Auth),
-    handle({url, response}, S1#state{upsock=UpSock, upbuf=[], upkey=Key, iup=IKey, oup=OKey});
+    {ok, UpSock, InEnc, OutEnc} = sock5:connect({ForwardHost, ForwardPort}, {Host, Port}, Auth),
+    handle({url, response}, S1#state{upsock=UpSock, upbuf=[], upin=InEnc, upout=OutEnc});
 
 handle({url, response}, S=#state{downsock=Socket}) ->
     S1 = sock_send(Socket, <<5:8, 0:8, 0:8, 1:8, 0:32, 0:16>>, S),
